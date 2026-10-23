@@ -40,7 +40,12 @@ function heeftBegrenzing(tool) {
 async function mcpAanroep(proc, bericht) {
   return new Promise((resolve, reject) => {
     let buffer = "";
-    const timer = setTimeout(() => reject(new Error(`geen antwoord binnen 8s op ${bericht.method}`)), 8000);
+    // 30s, niet 8s: een koude npx-install van een grotere server (gemeten bij
+    // @modelcontextprotocol/server-everything, die zelf nog sub-pakketten
+    // ophaalt) duurt op de allereerste run ruim langer dan 8s voor hij ook
+    // maar antwoordt, los van onze eigen code. Met warm npx-cache is dit
+    // ruim binnen een paar seconden.
+    const timer = setTimeout(() => reject(new Error(`geen antwoord binnen 30s op ${bericht.method}`)), 30000);
     const onData = (chunk) => {
       buffer += chunk.toString("utf8");
       const regel = buffer.indexOf("\n");

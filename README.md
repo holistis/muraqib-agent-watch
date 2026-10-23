@@ -18,20 +18,20 @@ This is a capability inventory, not a security audit. It tells you *what an agen
 
 ## Usage
 
-This is not published on npm yet. Until it is, run it straight from GitHub. It needs Node.js 20 or newer and git:
+Run it with npx. It needs Node.js 20 or newer:
 
 ```
-npx -y github:holistis/muraqib-agent-watch <command> [args...]
+npx muraqib-agent-watch <command> [args...]
 ```
 
 Examples:
 
 ```
-npx -y github:holistis/muraqib-agent-watch npx -y some-mcp-server
-npx -y github:holistis/muraqib-agent-watch node dist/index.js
+npx muraqib-agent-watch npx -y some-mcp-server
+npx muraqib-agent-watch node dist/index.js
 ```
 
-The command is whatever you'd normally run to start that MCP server over stdio. It works on Windows (Node.js 24) and on Linux (Node.js 18 prints an engine warning but runs).
+The command is whatever you'd normally run to start that MCP server over stdio. It works on Windows with Node.js 24. On Node.js 18, npm prints an engine warning.
 
 Important: this starts that command on your machine, because starting the server is the only way to ask it for its tool list. It never calls the server's tools, but the server's own code does run. Only point it at servers you would be willing to run anyway, or run it inside a throwaway machine or container.
 

@@ -14,7 +14,7 @@ For every tool that touches one of these, it checks whether the tool's own descr
 
 ## What this is not
 
-This is a capability inventory, not a security audit. It tells you *what an agent's tools claim to be able to do*, based on keyword matching against names, descriptions and schemas, so it never calls any of the server's tools, does not prove a stated safeguard actually works, and will miss anything not reflected in the tool's own text. Treat a clean report as "nothing obvious to flag," not as a guarantee.
+This is a capability inventory, not a security audit. It tells you *what an agent's tools claim to be able to do*, based on keyword matching against names, descriptions and schemas. It never calls any of the server's tools, does not prove a stated safeguard actually works, and will miss anything not reflected in the tool's own text. Treat a clean report as "nothing obvious to flag," not as a guarantee.
 
 ## Usage
 

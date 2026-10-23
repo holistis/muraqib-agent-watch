@@ -37,21 +37,21 @@ Important: this starts that command on your machine, because starting the server
 
 ## Example output
 
-This is the real output for the deliberately unsafe test server in `src/test-fake-unsafe-server.mjs` (path shortened). The output is currently in Dutch: geld = money, bestanden = files, extern = outbound, vernietigend = destructive, identiteit = credentials.
+This is the real output for the deliberately unsafe test server in `src/test-fake-unsafe-server.mjs` (path shortened). The output is in English by default; add `--lang=nl` as the first argument (or set `MURAQIB_LANG=nl`) for Dutch.
 
 ```
-muraqib-agent-watch -- 2 tool(s) gevonden bij "node src/test-fake-unsafe-server.mjs"
+muraqib-agent-watch -- 2 tool(s) found at "node src/test-fake-unsafe-server.mjs"
 
 [send_payment]
-  categorieen: geld, extern
-  GEEN zichtbare begrenzing genoemd in de beschrijving -- zelf nakijken
+  categories: money, outbound
+  NO stated safeguard -- review this one yourself
 
 [delete_file]
-  categorieen: bestanden, vernietigend
-  GEEN zichtbare begrenzing genoemd in de beschrijving -- zelf nakijken
+  categories: files, destructive
+  NO stated safeguard -- review this one yourself
 
-Samenvatting: 2 tools, 2 met een risicocategorie zonder zichtbare begrenzing.
-Kijk deze als eerste na: send_payment, delete_file
+Summary: 2 tools, 2 with a risk category and no stated safeguard.
+Check these first: send_payment, delete_file
 ```
 
 ## Status

@@ -1,0 +1,31 @@
+{
+  "name": "muraqib-agent-watch",
+  "version": "0.1.0",
+  "description": "Free, instant capability check for any MCP server: lists what it can actually do (money, files, outbound messages, destructive actions, credentials) and flags tools that don't state their own safeguard, so you know what to review before trusting an AI agent with it.",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "ai-agent",
+    "ai-safety",
+    "agent-security"
+  ],
+  "author": "holistis",
+  "license": "MIT",
+  "homepage": "https://github.com/holistis/muraqib-agent-watch",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/holistis/muraqib-agent-watch.git"
+  },
+  "type": "module",
+  "bin": {
+    "muraqib-agent-watch": "src/watch.mjs"
+  },
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20"
+  }
+}

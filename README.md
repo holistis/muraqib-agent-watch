@@ -14,38 +14,44 @@ For every tool that touches one of these, it checks whether the tool's own descr
 
 ## What this is not
 
-This is a capability inventory, not a security audit. It tells you *what an agent's tools claim to be able to do*, based on keyword matching against names, descriptions and schemas — it does not execute anything, does not prove a stated safeguard actually works, and will miss anything not reflected in the tool's own text. Treat a clean report as "nothing obvious to flag," not as a guarantee.
+This is a capability inventory, not a security audit. It tells you *what an agent's tools claim to be able to do*, based on keyword matching against names, descriptions and schemas, so it never calls any of the server's tools, does not prove a stated safeguard actually works, and will miss anything not reflected in the tool's own text. Treat a clean report as "nothing obvious to flag," not as a guarantee.
 
 ## Usage
 
+This is not published on npm yet. Until it is, run it straight from GitHub. It needs Node.js 20 or newer and git:
+
 ```
-npx muraqib-agent-watch <command> [args...]
+npx -y github:holistis/muraqib-agent-watch <command> [args...]
 ```
 
 Examples:
 
 ```
-npx muraqib-agent-watch npx -y some-mcp-server
-npx muraqib-agent-watch node dist/index.js
+npx -y github:holistis/muraqib-agent-watch npx -y some-mcp-server
+npx -y github:holistis/muraqib-agent-watch node dist/index.js
 ```
 
-The command is whatever you'd normally run to start that MCP server over stdio.
+The command is whatever you'd normally run to start that MCP server over stdio. It works on Windows (Node.js 24) and on Linux (Node.js 18 prints an engine warning but runs).
+
+Important: this starts that command on your machine, because starting the server is the only way to ask it for its tool list. It never calls the server's tools, but the server's own code does run. Only point it at servers you would be willing to run anyway, or run it inside a throwaway machine or container.
 
 ## Example output
 
+This is the real output for the deliberately unsafe test server in `src/test-fake-unsafe-server.mjs` (path shortened). The output is currently in Dutch: geld = money, bestanden = files, extern = outbound, vernietigend = destructive, identiteit = credentials.
+
 ```
-muraqib-agent-watch -- 3 tool(s) found at "node dist/index.js"
+muraqib-agent-watch -- 2 tool(s) gevonden bij "node src/test-fake-unsafe-server.mjs"
 
-[record_delivery]
-  categories: money, outbound, credentials
-  states its own safeguard (check it actually holds)
+[send_payment]
+  categorieen: geld, extern
+  GEEN zichtbare begrenzing genoemd in de beschrijving -- zelf nakijken
 
-[get_delivery_history]
-  categories: money, files, outbound, credentials
-  NO stated safeguard -- review this one yourself
+[delete_file]
+  categorieen: bestanden, vernietigend
+  GEEN zichtbare begrenzing genoemd in de beschrijving -- zelf nakijken
 
-Summary: 3 tools, 1 with a risk category and no stated safeguard.
-Check these first: get_delivery_history
+Samenvatting: 2 tools, 2 met een risicocategorie zonder zichtbare begrenzing.
+Kijk deze als eerste na: send_payment, delete_file
 ```
 
 ## Status

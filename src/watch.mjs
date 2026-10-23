@@ -18,7 +18,13 @@ const CATEGORIEEN = {
 const BEGRENZING_WOORDEN = ["validate", "verify", "verified", "scope", "limit", "allowlist", "require", "must", "pattern", "forbidden", "read-only", "never writes", "never touches"];
 
 function vindCategorieen(tool) {
-  const tekst = `${tool.name} ${tool.description || ""} ${JSON.stringify(tool.inputSchema || {})}`.toLowerCase();
+  // $schema is bijna altijd "https://json-schema.org/...", en dat bevat de
+  // substring "http" -- zonder dit te verwijderen kreeg bijna ELKE tool
+  // (van wat voor server dan ook) automatisch "extern" als categorie, puur
+  // door zijn eigen schema-metadata, niet door wat de tool echt doet
+  // (gemeten tegen @modelcontextprotocol/server-filesystem, 2026-10-23).
+  const schemaZonderMeta = JSON.stringify(tool.inputSchema || {}).replace(/"\$schema":"[^"]*"/g, "");
+  const tekst = `${tool.name} ${tool.description || ""} ${schemaZonderMeta}`.toLowerCase();
   const gevonden = [];
   for (const [naam, woorden] of Object.entries(CATEGORIEEN)) {
     if (woorden.some((w) => tekst.includes(w))) gevonden.push(naam);
@@ -64,9 +70,13 @@ async function main() {
   // Windows heeft shell:true nodig om een .cmd-shim als npx te vinden, maar
   // shell:true + een los args-array laat Node zelf een shell-string bouwen
   // zonder escaping (precies de DEP0190-waarschuwing). Dus zelf, veilig,
-  // quoten: elk argument tussen dubbele aanhalingstekens, interne
-  // aanhalingstekens verdubbeld, nooit het hele commando als kale string erin.
-  const veiligCitaat = (s) => `"${String(s).replace(/"/g, '""')}"`;
+  // quoten -- MAAR het commando zelf (npx, node, ...) NOOIT aanhalen als het
+  // geen spatie bevat: cmd.exe's batch-interpreter (npx is zelf een .cmd-
+  // bestand) leest zijn eigen pad anders zodra de aanroep zelf al aangehaald
+  // binnenkomt, en loste dan intern het verkeerde npm-prefix.js-pad op
+  // (gemeten 2026-10-23: "Cannot find module ...node_modules\npm\bin\npm-
+  // prefix.js", alleen via dit script, nooit bij een kale `npx`-aanroep).
+  const veiligCitaat = (s) => (/[\s"&|<>^%]/.test(s) ? `"${String(s).replace(/"/g, '""')}"` : String(s));
   const proc =
     process.platform === "win32"
       ? spawn([veiligCitaat(commando), ...args.map(veiligCitaat)].join(" "), { stdio: ["pipe", "pipe", "pipe"], shell: true })

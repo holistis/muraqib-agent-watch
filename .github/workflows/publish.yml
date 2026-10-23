@@ -1,0 +1,45 @@
+name: Publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type "publish" to confirm publishing the current version in package.json to npm'
+        required: true
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    if: github.event.inputs.confirm == 'publish'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+
+      - name: Update npm (trusted publishing + provenance need npm >= 11.5.1)
+        run: npm install -g npm@latest
+
+      # Zelfde test die lokaal al groen was: een echte MCP-robot starten en een
+      # tools/list-antwoord krijgen. Hier nog eens, tegen de inhoud die echt
+      # gepubliceerd wordt, niet de werkmap.
+      - name: Smoke test (deliberately unsafe fixture must be flagged)
+        run: node src/watch.mjs node src/test-fake-unsafe-server.mjs | grep -q "send_payment, delete_file"
+
+      # Dit is NIET trusted publishing (dat kan geen gloednieuwe pakketnaam
+      # koppelen, zie npm-publish-token-alghanima in memory): een granular
+      # token met bypass-2FA, alleen voor DEZE eerste publicatie. Zodra het
+      # pakket bestaat, trusted publishing instellen op npmjs.com en dit
+      # token-gebruik hier verwijderen.
+      - name: Publish to npm with provenance
+        run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

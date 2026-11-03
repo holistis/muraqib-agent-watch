@@ -7,6 +7,9 @@
 //   node src/watch.mjs npx capacity-attest
 //   node src/watch.mjs node dist/index.js
 import { spawn } from "node:child_process";
+import { readFileSync } from "node:fs";
+
+const VERSIE = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8")).version;
 
 // Taal van de uitvoer: Engels is de standaard (de README is Engels). Nederlands kan met
 // --lang=nl (als eerste argument) of MURAQIB_LANG=nl. De interne categoriesleutels blijven
@@ -114,6 +117,16 @@ async function mcpAanroep(proc, bericht) {
 
 async function main() {
   const [commando, ...args] = process.argv.slice(2);
+  // --help en --version horen een gebruiker te antwoorden en NIET als servercommando te worden gestart
+  // (voorheen probeerde "muraqib-agent-watch --help" een server met die naam te starten en meldde NOT_MEASURED).
+  if (commando === "--help" || commando === "-h") {
+    for (const regel of T.usage) console.log(regel);
+    return;
+  }
+  if (commando === "--version" || commando === "-v") {
+    console.log(VERSIE);
+    return;
+  }
   if (!commando) {
     for (const regel of T.usage) console.log(regel);
     process.exitCode = 2;
@@ -139,7 +152,7 @@ async function main() {
 
   let tools;
   try {
-    await mcpAanroep(proc, { jsonrpc: "2.0", id: 1, method: "initialize", params: { protocolVersion: "2026-06-18", capabilities: {}, clientInfo: { name: "muraqib-agent-watch", version: "0.2.0" } } });
+    await mcpAanroep(proc, { jsonrpc: "2.0", id: 1, method: "initialize", params: { protocolVersion: "2026-06-18", capabilities: {}, clientInfo: { name: "muraqib-agent-watch", version: VERSIE } } });
     const antwoord = await mcpAanroep(proc, { jsonrpc: "2.0", id: 2, method: "tools/list", params: {} });
     tools = antwoord.result?.tools;
     if (!Array.isArray(tools)) throw new Error(T.noToolList(JSON.stringify(antwoord).slice(0, 200)));
